@@ -6,13 +6,13 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/schollz/progressbar/v3"
 	"github.com/shurcooL/githubv4"
 	"golang.org/x/oauth2"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"sync"
 	"syscall"
@@ -78,15 +78,11 @@ var (
 	adjustDelay      bool
 	rateLimit        *RateLimit
 	outputFile       string
-	bar              = &progressbar.ProgressBar{}
-	barInitialized   = false
 	reposToGet       int
 	reposRetrieved   int
-	firstRound       = true
 	delayMutex       = &sync.Mutex{}
 	silent           bool
 	results          = make([]UserResult, 0)
-	resultsMutex     = &sync.Mutex{}
 )
 
 func adjustDelayTime(rateLimit RateLimit) {
@@ -118,9 +114,7 @@ errHandle:
 		goto errHandle
 	}
 
-	if firstRound {
-		reposToGet += result.Search.RepositoryCount
-	} else if adjustDelay {
+	if adjustDelay {
 		adjustDelayTime(result.RateLimit)
 	}
 	sleep := int64(requestDelay*result.RateLimit.Cost)*int64(time.Millisecond) - duration
@@ -137,12 +131,10 @@ func addRepo(user *UserResult, repo *Repository) {
 }
 
 func addUser(user UserResult) {
-	resultsMutex.Lock()
 	results = append(results, user)
-	resultsMutex.Unlock()
 }
 
-func getRepos(query string, startingDate time.Time, endingDate time.Time, userRes *UserResult, wg, barrier *sync.WaitGroup) {
+func getRepos(query string, startingDate time.Time, endingDate time.Time, userRes *UserResult) {
 	var reposQuery ReposQuery
 	querySplit := strings.Split(query, "created:")
 	query = strings.Trim(querySplit[0], " ") + " created:" +
@@ -154,40 +146,24 @@ func getRepos(query string, startingDate time.Time, endingDate time.Time, userRe
 	doQuery(&reposQuery, &variables)
 
 	maxRepos := reposQuery.Search.RepositoryCount
-	if maxRepos == 0 {
-		return
-	}
-
 	if userRes == nil {
-		repos := make([]RepoResult, 0)
-		userRes = &UserResult{
-			URL:   reposQuery.Search.Edges[0].Node.Repo.Owner.URL,
-			Repos: &repos,
+		reposToGet = maxRepos
+		if maxRepos > 0 {
+			repos := make([]RepoResult, 0)
+			userRes = &UserResult{
+				URL:   reposQuery.Search.Edges[0].Node.Repo.Owner.URL,
+				Repos: &repos,
+			}
+			defer addUser(*userRes)
+		} else {
+			return
 		}
-		barrier.Done()
-		defer wg.Done()
-		defer addUser(*userRes)
 	}
-
-	barrier.Wait()
-	delayMutex.Lock()
-	if !barInitialized {
-		firstRound = false
-		bar = progressbar.NewOptions(reposToGet,
-			progressbar.OptionSetDescription("Downloading results..."),
-			progressbar.OptionSetItsString("repos"),
-			progressbar.OptionShowIts(),
-			progressbar.OptionShowCount(),
-			progressbar.OptionOnCompletion(func() { fmt.Println() }),
-		)
-		barInitialized = true
-	}
-	delayMutex.Unlock()
 
 	if maxRepos >= 1000 {
 		dateDif := endingDate.Sub(startingDate) / 2
-		getRepos(query, startingDate, startingDate.Add(dateDif), userRes, nil, nil)
-		getRepos(query, startingDate.Add(dateDif), endingDate, userRes, nil, nil)
+		getRepos(query, startingDate, startingDate.Add(dateDif), userRes)
+		getRepos(query, startingDate.Add(dateDif), endingDate, userRes)
 		return
 	}
 
@@ -200,7 +176,6 @@ func getRepos(query string, startingDate time.Time, endingDate time.Time, userRe
 		addRepo(userRes, &nodeStruct.Node.Repo)
 
 		reposCnt++
-		_ = bar.Add(1)
 	}
 
 	variables = map[string]interface{}{
@@ -221,11 +196,12 @@ func getRepos(query string, startingDate time.Time, endingDate time.Time, userRe
 			addRepo(userRes, &nodeStruct.Node.Repo)
 
 			reposCnt++
-			_ = bar.Add(1)
 		}
 
 		variables["after"] = githubv4.NewString(reposQuery.Search.PageInfo.EndCursor)
 	}
+
+	reposRetrieved += reposCnt
 }
 
 func handleGraphQLAPIError(err error) {
@@ -361,14 +337,11 @@ func main() {
 		}
 	}
 
-	var wg sync.WaitGroup
-	var barrier sync.WaitGroup
+	fmt.Println("In progress...")
 	for _, userName := range userNames {
-		wg.Add(1)
-		barrier.Add(1)
-		go getRepos("user:"+userName, githubCreateDate, time.Now().UTC(), nil, &wg, &barrier)
+		getRepos("user:"+userName, githubCreateDate, time.Now().UTC(), nil)
 	}
 
-	wg.Wait()
 	writeOutput(outputFile, silent)
+	fmt.Println("Done! " + strconv.Itoa(reposRetrieved) + " repositories found.")
 }

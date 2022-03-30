@@ -108,6 +108,7 @@ errHandle:
 	err := githubV4Client.Query(context.Background(), result, *variables)
 	duration := time.Since(start).Milliseconds() - int64(time.Millisecond)
 	delayMutex.Lock()
+	rateLimit = &result.RateLimit
 	if err != nil {
 		handleGraphQLAPIError(err)
 		delayMutex.Unlock()
@@ -115,9 +116,9 @@ errHandle:
 	}
 
 	if adjustDelay {
-		adjustDelayTime(result.RateLimit)
+		adjustDelayTime(*rateLimit)
 	}
-	sleep := int64(requestDelay*result.RateLimit.Cost)*int64(time.Millisecond) - duration
+	sleep := int64(requestDelay*rateLimit.Cost)*int64(time.Millisecond) - duration
 	delayMutex.Unlock()
 	time.Sleep(time.Duration(sleep))
 }

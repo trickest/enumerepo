@@ -148,7 +148,7 @@ func getRepos(query string, startingDate time.Time, endingDate time.Time, userRe
 	maxRepos := reposQuery.Search.RepositoryCount
 	if userRes == nil {
 		reposToGet = maxRepos
-		if maxRepos > 0 {
+		if maxRepos > 0 && len(reposQuery.Search.Edges) > 0 {
 			repos := make([]RepoResult, 0)
 			userRes = &UserResult{
 				URL:   reposQuery.Search.Edges[0].Node.Repo.Owner.URL,

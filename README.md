@@ -38,35 +38,97 @@ go install github.com/trickest/enumerepo@latest
 ```
 
 ### Example
-##### wordlist.txt
+##### usernames.txt
 ```
-dev
-prod/
-admin.py
-app/login.html
+trickest
 ```
 
 ```shell script
-$ enumerepo -d example.com -l 2 -w wordlist.txt
-example.com/dev
-example.com/prod
-example.com/dev/dev
-example.com/prod/dev
-example.com/dev/prod
-example.com/prod/prod
-example.com/dev/admin.py
-example.com/dev/app/login.html
-example.com/prod/admin.py
-example.com/prod/app/login.html
-example.com/dev/dev/admin.py
-example.com/dev/dev/app/login.html
-example.com/prod/dev/admin.py
-example.com/prod/dev/app/login.html
-example.com/dev/prod/admin.py
-example.com/dev/prod/app/login.html
-example.com/prod/prod/admin.py
-example.com/prod/prod/app/login.html
-
+$ enumerepo -token-string $GITHUB_TOKEN -usernames usernames.txt -o repositories.json
+In progress...
+[
+   {
+      "user": "https://github.com/trickest",
+      "repos": [
+        {
+            "url": "https://github.com/trickest/trickest-cli",
+            "ssh_url": "git@github.com:trickest/trickest-cli.git",
+            "language": "Go"
+         },
+         {
+            "url": "https://github.com/trickest/cve",
+            "ssh_url": "git@github.com:trickest/cve.git",
+            "language": ""
+         },
+         {
+            "url": "https://github.com/trickest/find-gh-poc",
+            "ssh_url": "git@github.com:trickest/find-gh-poc.git",
+            "language": "Go"
+         },
+         {
+            "url": "https://github.com/trickest/inventory",
+            "ssh_url": "git@github.com:trickest/inventory.git",
+            "language": ""
+         },
+         {
+            "url": "https://github.com/trickest/mksub",
+            "ssh_url": "git@github.com:trickest/mksub.git",
+            "language": "Go"
+         },
+         {
+            "url": "https://github.com/trickest/mkpath",
+            "ssh_url": "git@github.com:trickest/mkpath.git",
+            "language": "Go"
+         },
+         {
+            "url": "https://github.com/trickest/dsieve",
+            "ssh_url": "git@github.com:trickest/dsieve.git",
+            "language": "Go"
+         },
+         {
+            "url": "https://github.com/trickest/resolvers",
+            "ssh_url": "git@github.com:trickest/resolvers.git",
+            "language": ""
+         },
+         {
+            "url": "https://github.com/trickest/insiders",
+            "ssh_url": "git@github.com:trickest/insiders.git",
+            "language": ""
+         },
+         {
+            "url": "https://github.com/trickest/enumerepo",
+            "ssh_url": "git@github.com:trickest/enumerepo.git",
+            "language": "Go"
+         },
+         {
+            "url": "https://github.com/trickest/containers",
+            "ssh_url": "git@github.com:trickest/containers.git",
+            "language": "Shell"
+         },
+         {
+            "url": "https://github.com/trickest/safe-harbour",
+            "ssh_url": "git@github.com:trickest/safe-harbour.git",
+            "language": ""
+         },
+         {
+            "url": "https://github.com/trickest/mgwls",
+            "ssh_url": "git@github.com:trickest/mgwls.git",
+            "language": "Go"
+         },
+         {
+            "url": "https://github.com/trickest/log4j",
+            "ssh_url": "git@github.com:trickest/log4j.git",
+            "language": ""
+         },
+         {
+            "url": "https://github.com/trickest/action",
+            "ssh_url": "git@github.com:trickest/action.git",
+            "language": "Shell"
+         }
+      ]
+   }
+]
+Done! 15 repositories found.
 ```
 
 # Report Bugs / Feedback

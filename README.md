@@ -1,4 +1,4 @@
-<h1 align="center">enumerepo <a href="https://twitter.com/intent/tweet?text=enumerepo%20-%20Make%20URL%20path%20combinations%20using%20a%20wordlist%20https%3A%2F%2Fgithub.com%2Ftrickest%2Fenumerepo&hashtags=bugbounty,bugbountytips,infosec"><img src="https://img.shields.io/badge/Tweet--lightgrey?logo=twitter&style=social" alt="Tweet" height="20"/></a></h1>
+<h1 align="center">enumerepo <a href="https://twitter.com/intent/tweet?text=enumerepo%20-%20Read%20a%20list%20of%20GitHub%20usernames%20and%2For%20organizations%2C%20verify%20their%20existence%2C%20and%20list%20the%20repositories%20owned%20by%20each%20one.%20https%3A%2F%2Fgithub.com%2Ftrickest%2Fenumerepo&hashtags=bugbounty,bugbountytips,infosec"><img src="https://img.shields.io/badge/Tweet--lightgrey?logo=twitter&style=social" alt="Tweet" height="20"/></a></h1>
 <h3 align="center">List all public repositories for (valid) GitHub usernames</h3>
 
 ![enumerepo](enumerepo.png "enumerepo")

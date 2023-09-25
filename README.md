@@ -137,4 +137,4 @@ We look forward to any feedback you want to share with us or if you're stuck wit
 # Where does this fit in your methodology?
 Enumerepo is an integral part of the [Insiders](https://github.com/trickest/insiders) workflow many workflows in the Trickest store. Sign up on [trickest.com](https://trickest.com) to get access to these workflows or build your own from scratch!
 
-[<img src="./banner.png" />](https://trickest-access.paperform.co/)
+[<img src="./banner.png" />](https://trickest.io/auth/register)
